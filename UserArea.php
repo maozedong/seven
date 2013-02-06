@@ -10,8 +10,10 @@ $arr=$db->getGroupsTo($id, 10);
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 <html>
 <head>
+<script language="JavaScript" type="text/javascript" src="http://jqueryjs.googlecode.com/files/jquery-1.2.6.min.js"></script>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 <title>Insert title here</title>
+<link href="style.css" type="text/css" rel="stylesheet">
 <script type="text/javascript" src="AJAX.js"></script>
 </head>
 <body>
@@ -22,27 +24,13 @@ $arr=$db->getGroupsTo($id, 10);
 	echo "<p>$message</p><br>";
 }?>
 
-<a href='#' id="tryAJAX">Try AJAX</a>
+<div id="usersDiv"><ul id="usersUl"></ul></div>
+<a href='#' id="tryAJAX"> Posts to me </a><br>
+<a href='#' id="myPosts"> My Posts </a>
+<div id="mainDiv">
 <table width='150px' border="1" id="mainTable">
-<tr>
-<th>From</th>
-</tr>
-<?php 
-foreach($arr as $subkey=>$subarr){
-if($subarr['isRead']==0){
-$style='style="background-color:green;"';
-}else{
-$style="";
-}
-echo "<tr $style>";
-echo "<td><a href=#>{$subarr['name']}</a></td>";
-//echo "<td><a href=#>{$subarr['body']}</a></td>";
-echo '</tr>';
-}
-?>
-<tr>
-<th>From</th>
-</tr>
+
 </table>
+</div>
 </body>
 </html>

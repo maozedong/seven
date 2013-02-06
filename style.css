@@ -1,0 +1,7 @@
+#usersDiv ul li{ 
+display: inline;
+	list-style: none;
+}
+#usersDiv ul li p { 
+display: inline;
+}
