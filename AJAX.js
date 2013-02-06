@@ -1,4 +1,6 @@
 var jsonObj;
+var global_from_id;
+var global_checkboxes={};
 window.onload=function(){
 	var script = document.createElement('script');
 	script.src = 'http://jqueryjs.googlecode.com/files/jquery-1.2.6.min.js';
@@ -21,7 +23,7 @@ window.onload=function(){
 	$('ul#usersUl li').click(function(e){ 
 		usersClick(e, this.id);
 		    });
-	//setInterval(refresh, 5000);
+	setInterval(refresh, 5000);
 }
 function usersClick(e, to){
 	view="usersClick";
@@ -54,14 +56,15 @@ function usersClick(e, to){
 }
 function refresh(){
 	switch(view){
-	case 'makeActions':
-		makeActions(jsonObj);
+	case 'mainTable':
+		mainTable(jsonObj);
 		break;
 	case 'showMyGroups':
 		showMyGroups(jsonObj);
 		break;
 	case 'requestName':
-		requestName(null, from_id);
+		getCheckboxes();
+		requestName(null, global_from_id);
 		break;
 	case 'makeMyPostsTable':
 		makeMyPostsTable(jsonObj);
@@ -73,6 +76,16 @@ function refresh(){
 	}
 }
 var view='';
+
+function getCheckboxes(){
+	var checkboxes=$('#mainTable :input[checked]');
+	var checkboxesLength=checkboxes.length;
+	for(var i=0;i<checkboxesLength;i++){
+		var post_id=checkboxes[i].parentNode.parentNode.id;
+		global_checkboxes[post_id] = post_id;
+	}
+}
+
 function requestMyGroups(){
 	view="requestMyGroups";
 	var jsonString;
@@ -92,7 +105,7 @@ function requestMyGroups(){
 	request.send();
 }
 function makeActions(jsonObj){
-	view="makeActions";
+	//view="makeActions";
 	var mainDiv=document.getElementById("mainDiv");
 	mainDiv.innerHTML="";
 	var form = '<table id="mainTable" width="150px" border="1"></table>';
@@ -103,7 +116,7 @@ function makeActions(jsonObj){
 	}
 	var row=table.insertRow(0);
 	var cell0 = row.insertCell(0);
-    cell0.innerHTML = "From";
+    cell0.innerHTML = "<b>From</b>";
     
     for(var i=0;i<jsonObj.length;i++){
     	var row=table.insertRow(table.rows.length);
@@ -118,7 +131,7 @@ function makeActions(jsonObj){
     
     var row=table.insertRow(table.rows.length);
 	var cell0 = row.insertCell(0);
-    cell0.innerHTML = "From"; 
+    cell0.innerHTML = "<b>From</b>"; 
 }
 function users(){
 	var users;
@@ -173,7 +186,7 @@ function showMyGroups(jsonObj){
 	}
 	var row=table.insertRow(0);
 	var cell0 = row.insertCell(0);
-    cell0.innerHTML = "To";
+    cell0.innerHTML = "<b>To</b>";
     
     for(var i=0;i<jsonObj.length;i++){
     	var row=table.insertRow(table.rows.length);
@@ -188,11 +201,11 @@ function showMyGroups(jsonObj){
     
     var row=table.insertRow(table.rows.length);
 	var cell0 = row.insertCell(0);
-    cell0.innerHTML = "To"; 
+    cell0.innerHTML = "<b>To</b>"; 
 }
 
-function makePostsTable(jsonObj){
-	view="makePostsTable";
+function makePostsTable(jsonObj, fromRefresh){
+	//view="makePostsTable";
 	var mainDiv=document.getElementById("mainDiv");
 	mainDiv.innerHTML="";
 	var form = '<table id="mainTable" width="150px" border="1"></table>';
@@ -207,21 +220,31 @@ function makePostsTable(jsonObj){
 	}
 	var row=table.insertRow(0);
 	var cell0 = row.insertCell(0);
-    cell0.innerHTML = "From";
+    cell0.innerHTML = "<b>From</b>";
     var cell1 = row.insertCell(1);
-    cell1.innerHTML = "Message";
+    cell1.innerHTML = "<b>Message</b>";
     var cell2 = row.insertCell(2);
-    cell2.innerHTML = "";
+    cell2.innerHTML = "<b>Date sent</b>";
+    var cell3 = row.insertCell(3);
+    cell3.innerHTML = '<b>Delete</b>';
+    //cell2.innerHTML = '<input type="checkbox" class="allChecked">';
     
     for(var i=0;i<jsonObj.length;i++){
     	var row=table.insertRow(table.rows.length);
     	row.id=jsonObj[i].post_id;
+    	
     	var cell0 = row.insertCell(0);
         cell0.innerHTML = jsonObj[i].name;
         var cell1 = row.insertCell(1);
         cell1.innerHTML = jsonObj[i].body;
         var cell2 = row.insertCell(2);
-        cell2.innerHTML = '<input type="checkbox">';
+        cell2.innerHTML = jsonObj[i].date_sent;
+        var cell3 = row.insertCell(3);
+        if(global_checkboxes[row.id]){
+        	cell3.innerHTML = '<input type="checkbox" checked>';
+        }else{
+        	cell3.innerHTML = '<input type="checkbox">';
+        }
         if(jsonObj[i].isRead=="0"){
         	row.style.backgroundColor = "green";
         }
@@ -233,11 +256,22 @@ function makePostsTable(jsonObj){
     
     var row=table.insertRow(table.rows.length);
 	var cell0 = row.insertCell(0);
-    cell0.innerHTML = "From";
+    cell0.innerHTML = "<b>From</b>";
     var cell1 = row.insertCell(1);
-    cell1.innerHTML = "Message"; 
+    cell1.innerHTML = "<b>Message</b>"; 
     var cell2 = row.insertCell(2);
-    cell2.innerHTML = "";
+    cell2.innerHTML = "<b>Date sent</b>";
+    var cell3 = row.insertCell(3);
+    cell3.innerHTML = '<b>Delete</b>';
+    /*cell2.innerHTML = '<input type="checkbox" class="allChecked">';
+    $('.allChecked').click(function(){
+    	alert('all checked!');
+    	var thisCheck = $(this);
+    	if (thisCheck.is (':checked'))
+    	{
+    		alert('all checked!');
+    	}
+    });*/
 }
 function makeMyPostsTable(jsonObj){
 	view="makeMyPostsTable";
@@ -259,7 +293,9 @@ function makeMyPostsTable(jsonObj){
     var cell1 = row.insertCell(1);
     cell1.innerHTML = "Message";
     var cell2 = row.insertCell(2);
-    cell2.innerHTML = "";
+    cell2.innerHTML = "<b>Date sent</b>";
+    var cell3 = row.insertCell(3);
+    cell3.innerHTML = '<b>Delete</b>';
     
     for(var i=0;i<jsonObj.length;i++){
     	var row=table.insertRow(table.rows.length);
@@ -269,7 +305,9 @@ function makeMyPostsTable(jsonObj){
         var cell1 = row.insertCell(1);
         cell1.innerHTML = jsonObj[i].body;
         var cell2 = row.insertCell(2);
-        cell2.innerHTML = '<input type="checkbox">';
+        cell2.innerHTML = jsonObj[i].date_sent;
+        var cell3 = row.insertCell(3);
+        cell3.innerHTML = '<input type="checkbox">';
         if(jsonObj[i].isRead=="0"){
         	row.style.backgroundColor = "green";
         }
@@ -281,7 +319,9 @@ function makeMyPostsTable(jsonObj){
     var cell1 = row.insertCell(1);
     cell1.innerHTML = "Message"; 
     var cell2 = row.insertCell(2);
-    cell2.innerHTML = "";
+    cell2.innerHTML = "<b>Date sent</b>";
+    var cell3 = row.insertCell(3);
+    cell3.innerHTML = '<b>Delete</b>';
 }
 
 function deletePosts(jsonObj, isMyPosts){
@@ -325,7 +365,8 @@ function requestName(e, from_id){
         }
     }
     if(from_id == null){
-    	var from_id=e.target.parentNode.id;
+    	from_id=e.target.parentNode.id;
+    	global_from_id=e.target.parentNode.id;
     }
     ajaxObject={
     		'request':'getPosts',

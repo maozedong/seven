@@ -240,24 +240,26 @@ class Db{
 			));
 			$query1="SELECT * FROM posts WHERE posts.post_id='$post_id'";
 			$result=$db->fetchAll($query1);
-			if(($result[0]['is_deleted_from']==1) && ($result[0][is_deleted_to]==1)){
-				$test="from if(1,1)";
-				//$deleteQuery="DELETE FROM posts WHERE posts.post_id='$post_id'";
-				$test=$db->delete('posts',"post_id='$post_id'");
-				return $test;
-			}else{
+
 			if($user_id==$result[0]['from_id']){
 				$query2="UPDATE posts SET is_deleted_from='1' WHERE post_id='$post_id'";	
 			}else{
 				$query2="UPDATE posts SET is_deleted_to='1' WHERE post_id='$post_id'";
 			}
 			$result=$db->query($query2);
+			$query1="SELECT * FROM posts WHERE posts.post_id='$post_id'";
+			$result=$db->fetchAll($query1);
+			if(($result[0]['is_deleted_from']==1) && ($result[0][is_deleted_to]==1)){
+				$test="from if(1,1)";
+				$test=$db->delete('posts',"post_id='$post_id'");
+				return $test;
+			}
 			if($result!='0'){
 				return $test;
 			}else{
 				return 'all bad';
 			}
-			}
+			
 		}else{
 			return 'first return';//empty parameters
 		}
